@@ -1,24 +1,52 @@
-import tkinter as tk
-from PIL import Image, ImageTk
-from tkinter import filedialog
+from PIL import Image
+import streamlit as st
+import cv2
+import tensorflow as tf 
+import numpy as np
+from keras.models import load_model
+from PIL import Image
+import PIL
 
-def upload_img():
-    global img, image_data
-    for img_display in frame.winfo_children():
-        img_display.destroy()
+#Loading the Inception model
+model= load_model('frames.h5',compile=(False))
 
-    image_data = filedialog.askopenfilename(initialdir="/", title="Choose an image",
-                                       filetypes=(("all files", "*.*"), ("png files", "*.png")))
-    basewidth = 300
-    img = Image.open(image_data)
-    wpercent = (basewidth / float(img.size[0]))
-    hsize = int((float(img.size[1]) * float(wpercent)))
-    img = img.resize((basewidth, hsize), Image.ANTIALIAS)
-    img = st.Image.PhotoImage(img)
-    file_name = image_data.split('/')
-    panel = st.Label(frame, text= str(file_name[len(file_name)-1]).upper()).pack()
-    panel_image = st.Label(frame, image=img).pack()
+def splitting(name):
+    vidcap = cv2.VideoCapture(name)
+    success,frame = vidcap.read()
+    count = 0
+    frame_skip =1
+    while success:
+        success, frame = vidcap.read() # get next frame from video
+        cv2.imwrite(r"img/frame%d.jpg" % count, frame) 
+        if count % frame_skip == 0: # only analyze every n=300 frames
+            #print('frame: {}'.format(count)) 
+            pil_img = Image.fromarray(frame) # convert opencv frame (with type()==numpy) into PIL Image
+            #st.image(pil_img)
+        if count > 20 :
+            break
+        count += 1
+    preprocessing()
+
+def main():
     
+    st.title("Image Captioning")
+
+    file = st.file_uploader("Upload video",type=(['mp4']))
+    if file is not None: # run only when user uploads video
+        vid = file.name
+        with open(vid, mode='wb') as f:
+            f.write(file.read()) # save video to disk
+
+        st.markdown(f"""
+        ### Files
+        - {vid}
+        """,
+        unsafe_allow_html=True) # display file name
+
+        vidcap = cv2.VideoCapture(vid) # load video from disk
+        cur_frame = 0
+        success = True
+
 def caption():
     
     original = Image.open(image_data)
