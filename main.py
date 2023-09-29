@@ -39,20 +39,23 @@ def extract_image_features(frame):
     
 index_word = dict([(index,word) for word, index in tokenizer.word_index.items()])
 word_index = dict([(word,index) for index, word in tokenizer.index_word.items()])
+index_word = dict([(index,word) for word, index in tokenizer.word_index.items()])
 def generate_caption(frame_feature):
-    in_text = '<start>'
-    max_length = 30
-    for _ in range(max_length):
-        sequence = [word_index[word] for word in in_text.split() if word in word_index]
-        sequence = pad_sequences([sequence], maxlen=max_length)
+    maxlen = 30
+
+    in_text = 'startseq'
+
+    for iword in range(maxlen):
+        sequence = tokenizer.texts_to_sequences([in_text])[0]
+        sequence = pad_sequences([sequence],maxlen)
         prediction = model.predict([np.array([frame_feature]), np.array(sequence)])[0]
         prediction = np.argmax(prediction)
-        word = index_word[prediction]
-        in_text += ' ' + word
-        if word == '<end>':
+        newword = index_word[prediction]
+        in_text += " " + newword
+        if newword == "endseq":
             break
-    return in_text
-
+    return(in_text)
+    
 def generate_video_description(video_path):
     frames = extract_frames(video_path)
     frame_features = np.array([extract_image_features(frame) for frame in frames])
