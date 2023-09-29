@@ -57,7 +57,7 @@ def generate_video_description(video_path):
     descriptions = []
     for frame_feature in frame_features:
         frame_feature = np.expand_dims(frame_feature, axis=0)
-        caption = predict_caption(frame_feature)
+        caption = generate_caption(frame_feature)
         descriptions.append(caption)
     video_caption = " ".join(descriptions)
     return video_caption
