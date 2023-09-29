@@ -71,7 +71,7 @@ def generate_video_caption(video_path):
 
 def main():
     st.title("Video Captions Generator")
-    video_file = st.file_uploader("Upload a video", type=['mp4', 'avi'], accept_multiple_files=False, key="video_uploader")
+    video_file = st.file_uploader("Upload a video", type=['mp4', 'avi'], accept_multiple_files=False, key="video_uploader", maxUploadSize = 2)
 
     if video_file is not None:
         # Save video file
