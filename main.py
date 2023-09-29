@@ -72,6 +72,8 @@ def generate_video_description(video_path):
 
 
 def main():
+    link = '[Link to colab notebook](https://colab.research.google.com/drive/1ufu2fi-JW4gnMf7EKVi4Xi5liEnM_m6k?usp=sharing)'
+    st.markdown(link, unsafe_allow_html=True)
     st.title("Video Captions Generator")
     video_file = st.file_uploader("Upload a video", type=['mp4', 'avi'], accept_multiple_files=False, key="video_uploader")
 
