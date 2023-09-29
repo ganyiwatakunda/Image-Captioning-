@@ -56,7 +56,7 @@ def predict_caption(picture):
             break
     return(in_text)
 
-def generate_video_caption(video_path):
+def generate_video_description(video_path):
     frames = extract_frames(video_path)
     frame_features = np.array([extract_image_features(frame) for frame in frames])
     descriptions = []
