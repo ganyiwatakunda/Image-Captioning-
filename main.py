@@ -37,24 +37,19 @@ def extract_image_features(frame):
     frame = frame / 255.0
     return frame
 
-index_word = dict([(index,word) for word, index in tokenizer.word_index.items()])
-def predict_caption(picture):
-    '''
-    image.shape = (1,4462)
-    '''
-
-    in_text = 'begin'
-    maxlen = 34
-    for iword in range(maxlen):
-        sequence = tokenizer.texts_to_sequences([in_text])[0]
-        sequence = pad_sequences([sequence],maxlen)
-        yhat = model.predict([image,sequence],verbose=0)
-        yhat = np.argmax(yhat)
-        newword = index_word[yhat]
-        in_text += " " + newword
-        if newword == "stop":
+def generate_caption(frame_feature):
+    in_text = '<start>'
+    max_length = 30
+    for _ in range(max_length):
+        sequence = [word_to_idx[word] for word in in_text.split() if word in word_to_idx]
+        sequence = pad_sequences([sequence], maxlen=max_length)
+        prediction = model.predict([np.array([frame_feature]), np.array(sequence)])[0]
+        prediction = np.argmax(prediction)
+        word = idx_to_word[prediction]
+        in_text += ' ' + word
+        if word == '<end>':
             break
-    return(in_text)
+    return in_text
 
 def generate_video_description(video_path):
     frames = extract_frames(video_path)
