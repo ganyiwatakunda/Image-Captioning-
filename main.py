@@ -36,16 +36,17 @@ def extract_image_features(frame):
     frame = np.expand_dims(frame, axis=0)
     frame = frame / 255.0
     return frame
-
+    
+index_word = dict([(index,word) for word, index in tokenizer.word_index.items()])
 def generate_caption(frame_feature):
     in_text = '<start>'
     max_length = 30
     for _ in range(max_length):
-        sequence = [word_to_idx[word] for word in in_text.split() if word in word_to_idx]
+        sequence = [word_index[word] for word in in_text.split() if word in word_index]
         sequence = pad_sequences([sequence], maxlen=max_length)
         prediction = model.predict([np.array([frame_feature]), np.array(sequence)])[0]
         prediction = np.argmax(prediction)
-        word = idx_to_word[prediction]
+        word = index_word[prediction]
         in_text += ' ' + word
         if word == '<end>':
             break
