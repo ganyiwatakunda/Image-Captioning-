@@ -1,0 +1,14 @@
+tensorflow
+nltk
+tqdm
+streamlit
+numpy
+opencv-python
+opencv-contrib-python
+scikit-learn
+torch
+torchvision
+tensorboard
+tensorboardx
+--find-links https://storage.googleapis.com/jax-releases/jax_releases.html
+jax[cuda]>=version
