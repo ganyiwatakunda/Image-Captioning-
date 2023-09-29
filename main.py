@@ -84,6 +84,7 @@ def main():
             f.write(video_file.read())
 
         # Generate video description
+        video_frames = extract_frames(video_path)
         video_description = generate_video_description(video_path)
 
         # Display video description
