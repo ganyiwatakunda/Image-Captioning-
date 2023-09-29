@@ -12,7 +12,9 @@ with open('tokenizer.pickle', 'rb') as handle:
     tokenizer = pickle.load(handle)
   
 model = load_model('encoderdecodermodel.h5')
-image_model = load_model('saved_model_one.pb')
+modelvgg = VGG16(include_top=True, weights='imagenet')
+image_model = tf.keras.Model(inputs=modelvgg.inputs, outputs=modelvgg.layers[-2].output)
+
 
 def extract_frames(video_path):
     # Code to extract frames from video
