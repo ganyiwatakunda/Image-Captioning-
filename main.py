@@ -44,7 +44,7 @@ def predict_caption(picture):
     '''
 
     in_text = 'begin'
-
+    maxlen = 34
     for iword in range(maxlen):
         sequence = tokenizer.texts_to_sequences([in_text])[0]
         sequence = pad_sequences([sequence],maxlen)
