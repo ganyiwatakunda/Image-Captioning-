@@ -85,6 +85,9 @@ def main():
 
         # Generate video description
         video_frames = extract_frames(video_path)
+        st.subheader("Video frames :")
+        st.write(video_frames)
+        
         video_description = generate_video_description(video_path)
 
         # Display video description
