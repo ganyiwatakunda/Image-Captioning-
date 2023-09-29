@@ -1,78 +1,86 @@
-from PIL import Image
 import streamlit as st
-import cv2
-import tensorflow as tf 
 import numpy as np
-from keras.models import load_model
-from PIL import Image
-import PIL
+import cv2
+from tensorflow.keras.models import load_model
+from tensorflow.keras.applications import VGG16
+from tensorflow.keras.preprocessing.image import img_to_array
+from tensorflow.keras.preprocessing.sequence import pad_sequences
 
-#Loading the Inception model
-model= load_model('frames.h5',compile=(False))
+# loading
+with open('tokenizer.pickle', 'rb') as handle:
+    tokenizer = pickle.load(handle)
+  
+model = load_model('saved_model.pb')
+image_model = load_model('saved_model_one.pb')
 
-def splitting(name):
-    vidcap = cv2.VideoCapture(name)
-    success,frame = vidcap.read()
-    count = 0
-    frame_skip =1
-    while success:
-        success, frame = vidcap.read() # get next frame from video
-        cv2.imwrite(r"img/frame%d.jpg" % count, frame) 
-        if count % frame_skip == 0: # only analyze every n=300 frames
-            #print('frame: {}'.format(count)) 
-            pil_img = Image.fromarray(frame) # convert opencv frame (with type()==numpy) into PIL Image
-            #st.image(pil_img)
-        if count > 20 :
+def extract_frames(video_path):
+    # Code to extract frames from video
+    frames = []
+    cap = cv2.VideoCapture(video_path)
+    while cap.isOpened():
+        ret, frame = cap.read()
+        if not ret:
             break
-        count += 1
-    preprocessing()
+        frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        frames.append(frame)
+    cap.release()
+    return frames
+
+def extract_image_features(frame):
+    frame = cv2.resize(frame, (224, 224))
+    frame = img_to_array(frame)
+    frame = np.expand_dims(frame, axis=0)
+    frame = frame / 255.0
+    return frame
+
+index_word = dict([(index,word) for word, index in tokenizer.word_index.items()])
+def predict_caption(picture):
+    '''
+    image.shape = (1,4462)
+    '''
+
+    in_text = 'begin'
+
+    for iword in range(maxlen):
+        sequence = tokenizer.texts_to_sequences([in_text])[0]
+        sequence = pad_sequences([sequence],maxlen)
+        yhat = model.predict([image,sequence],verbose=0)
+        yhat = np.argmax(yhat)
+        newword = index_word[yhat]
+        in_text += " " + newword
+        if newword == "stop":
+            break
+    return(in_text)
+
+def generate_video_caption(video_path):
+    frames = extract_frames(video_path)
+    frame_features = np.array([extract_image_features(frame) for frame in frames])
+    descriptions = []
+    for frame_feature in frame_features:
+        frame_feature = np.expand_dims(frame_feature, axis=0)
+        caption = generate_caption(picture)
+        descriptions.append(caption)
+    video_caption = " ".join(descriptions)
+    return video_caption
+# Streamlit app
+
 
 def main():
-    
-    st.title("Image Captioning")
+    st.title("Video Captions Generator")
+    video_file = st.file_uploader("Upload a video", type=['mp4', 'avi'], accept_multiple_files=False, key="video_uploader")
 
-    file = st.file_uploader("Upload video",type=(['mp4']))
-    if file is not None: # run only when user uploads video
-        vid = file.name
-        with open(vid, mode='wb') as f:
-            f.write(file.read()) # save video to disk
+    if video_file is not None:
+        # Save video file
+        video_path = 'uploaded_video.mp4'
+        with open(video_path, 'wb') as f:
+            f.write(video_file.read())
 
-        st.markdown(f"""
-        ### Files
-        - {vid}
-        """,
-        unsafe_allow_html=True) # display file name
+        # Generate video description
+        video_description = generate_video_description(video_path)
 
-        vidcap = cv2.VideoCapture(vid) # load video from disk
-        cur_frame = 0
-        success = True
+        # Display video description
+        st.subheader("The generated captions:")
+        st.write(video_description)
 
-def caption():
-    
-    original = Image.open(image_data)
-    original = original.resize((224, 224), Image.ANTIALIAS)
-    numpy_image = img_to_array(original)
-    nimage = preprocess_input(numpy_image)
-    
-    feature = modelvgg.predict(nimage.reshape( (1,) + nimage.shape[:3]))
-    caption = predict_caption(feature)
-    table = st.Label(frame, text="Caption: " + caption[9:-7], font=("Helvetica", 12)).pack()
-
-root.title('IMAGE CAPTION GENERATOR')
-root.iconbitmap('class.ico')
-root.resizable(False, False)
-tit = st.Label(root, text="IMAGE CAPTION GENERATOR", padx=25, pady=6, font=("", 12)).pack()
-canvas = st.Canvas(root, height=550, width=600, bg='#D1EDf2')
-canvas.pack()
-frame = st.Frame(root, bg='white')
-frame.place(relwidth=0.8, relheight=0.8, relx=0.1, rely=0.1)
-chose_image = st.Button(root, text='Choose Image',
-                        padx=35, pady=10,
-                        fg="black", bg="pink", command=upload_img, activebackground="#add8e6")
-chose_image.pack(side=tk.LEFT)
-
-caption_image = st.Button(root, text='Classify Image',
-                        padx=35, pady=10,
-                        fg="black", bg="pink", command=caption, activebackground="#add8e6")
-caption_image.pack(side=tk.RIGHT)
-root.mainloop()
+if __name__ == '__main__':
+    main()
