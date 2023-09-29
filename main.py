@@ -37,13 +37,12 @@ def extract_image_features(frame):
     frame = frame / 255.0
     return frame
     
-index_word = dict([(index,word) for word, index in tokenizer.word_index.items()])
-word_index = dict([(word,index) for index, word in tokenizer.index_word.items()])
+
 index_word = dict([(index,word) for word, index in tokenizer.word_index.items()])
 def generate_caption(frame_feature):
-    '''
-    image.shape = (1,4462)
-    '''
+    
+    frame_feature.shape = (None, 4096)
+    
     maxlen = 30
 
     in_text = 'startseq'
