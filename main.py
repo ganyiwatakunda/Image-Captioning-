@@ -10,7 +10,7 @@ from tensorflow.keras.preprocessing.sequence import pad_sequences
 with open('tokenizer.pickle', 'rb') as handle:
     tokenizer = pickle.load(handle)
   
-model = load_model('saved_model.pb')
+model = load_model('encoderdecodermodel.h5')
 image_model = load_model('saved_model_one.pb')
 
 def extract_frames(video_path):
