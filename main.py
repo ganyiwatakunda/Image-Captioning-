@@ -51,7 +51,7 @@ def generate_caption(frame_feature):
     frame_feature = frame_feature.reshape(None, 4096)
 
 # Assuming you are trying to pass the reshaped input to 'model_1'
-model_1_output = model_1.predict(reshaped_input)
+    model_1_output = model_1.predict(reshaped_input)
     
     maxlen = 30
 
