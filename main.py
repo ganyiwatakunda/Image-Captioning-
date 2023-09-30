@@ -41,7 +41,6 @@ def extract_image_features(frame):
 index_word = dict([(index,word) for word, index in tokenizer.word_index.items()])
 def generate_caption(frame_feature):
     
-    frame_feature.reshape = (4096)
     import numpy as np
 
 # Example input data with a shape of (None, 150528)
