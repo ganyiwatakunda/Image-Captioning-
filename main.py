@@ -42,6 +42,16 @@ index_word = dict([(index,word) for word, index in tokenizer.word_index.items()]
 def generate_caption(frame_feature):
     
     frame_feature.reshape = (4096)
+    import numpy as np
+
+# Example input data with a shape of (None, 150528)
+    frame_feature = np.random.rand(None, 150528)  # Assuming a batch size of 32
+
+# Reshape the input data to match the expected shape of (None, 4096)
+    frame_feature = frame_feature.reshape(None, 4096)
+
+# Assuming you are trying to pass the reshaped input to 'model_1'
+model_1_output = model_1.predict(reshaped_input)
     
     maxlen = 30
 
