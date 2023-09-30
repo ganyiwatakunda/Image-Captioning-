@@ -41,7 +41,7 @@ def extract_image_features(frame):
 index_word = dict([(index,word) for word, index in tokenizer.word_index.items()])
 def generate_caption(frame_feature):
     
-    frame_feature.shape = (37632, 4)
+    frame_feature.shape = (150528)
     
     maxlen = 30
 
